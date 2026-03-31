@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Powershell project to Azure Function App - cipppgrn6 # Change cippdh4c to your Function App Name
+name: Build and deploy Powershell project to Azure Function App - cipppgrn6
 
 on:
   push:
@@ -13,17 +13,28 @@ env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
 
 jobs:
-  build-and-deploy:
-    runs-on: windows-latest
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
     steps:
       - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_05394944F9F245CAA7DC6D8DD1FB14B3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6280420FB0EB4744A86339B24486AEEB }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_21702B277AA442128328AF3F0B69A2E6 }}
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: 'cipppgrn6' # Change this to your function app name (eg cippdh4ch)
+          app-name: 'cipppgrn6'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_A1F94EA1E1BC42128E1679D024661FF2 }} # Change this to your repository secret name
+          
